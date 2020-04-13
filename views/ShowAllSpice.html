@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Spice List</title>
+    <link rel ="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+<div class="menu">
+    <ul>
+        <li><a href="/add_new">Добавить новую специю</a></li>
+        <li><a href="/delete_for_id">Удалить специю</a></li>
+    </ul>
+</div>
+<h1>Список добавленных специй</h1>
+<div class="help">
+    <p> Сейчас представленно в виде таблицы, в последствии будет в виде списка состоящего из отдельных блоков.</p>
+    <p> Каждый блок будет иметь кнопки управления.</p>
+</div>
+<table class="paleBlueRows">
+    <tr>
+        <th>Id</th>
+        <th>Title</th>
+        <th>Sum</th>
+        <th>Location</th>
+    </tr>
+    {{each(options.result)}}
+    <tr>
+        <td> {{@this.spice_id}} </td>
+        <td> {{@this.title}} </td>
+        <td> {{@this.sum}} </td>
+        <td> {{@this.location}} </td>
+    </tr>
+    {{/each}}
+</table>
+</body>
+</html>
