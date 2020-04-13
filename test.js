@@ -21,7 +21,7 @@ app.get('/delete_for_id', function (req, res) {
     res.send(myHtml.deleteForId());
 });
 
-app.post('/', function(req, res) {
+app.post('/delete', function(req, res) {
     var spice_id = req.body.spice_id;
     myDBM.deleteSpice(spice_id);
     myDBM.selectAllSpice((result) => {
