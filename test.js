@@ -4,7 +4,9 @@ var myDBM = require('./database_manager.js');
 var myHtml = require('./make_html.js');
 
 app.use(express.json());       // to support JSON-encoded bodies
-app.use(express.urlencoded()); // to support URL-encoded bodies
+app.use(express.urlencoded({
+    extended: true
+})); // to support URL-encoded bodies
 app.use(express.static('public'));  // to support send static files
 
 app.get('/', function (req, res) {
@@ -31,7 +33,7 @@ app.post('/delete', function(req, res) {
 
 app.post('/', function(req, res) {
     var title = req.body.title,
-        sum = req.body.sum,
+        sum = isNaN(parseInt(req.body.sum)) ? 0 : parseInt(req.body.sum),
         loc = req.body.location;
     myDBM.addNewSpice(title, sum, loc);
     res.send(myHtml.makeForm());
