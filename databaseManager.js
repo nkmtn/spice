@@ -1,9 +1,14 @@
+/*
+    databaseManager - module for control databases connection
+ */
+
 var mysql = require('mysql');
 
 class DatabaseManager {
 
     #pool;
 
+    // Config for databases manage
     constructor() {
         /*TODO config*/
         this.#pool  = mysql.createPool({
@@ -27,6 +32,7 @@ class DatabaseManager {
         });
     }
 
+    // function for select all the records of databases
     selectAllSpice(callback){
         this.#getConnection().then((conn) => {
             var sql = "select * from spiceinfo;";
@@ -39,6 +45,7 @@ class DatabaseManager {
         })
     }
 
+    // function for adding a new record in databases
     addNewSpice(title, count, loc){
         this.#getConnection().then((conn) => {
             var sql = "insert into spiceinfo (title, sum, location)" +
@@ -51,6 +58,7 @@ class DatabaseManager {
         })
     }
 
+    // function for delete the record of databases
     deleteSpice(spice_id){
         this.#getConnection().then((conn) => {
             var sql = "delete from spiceinfo where spice_id=" + spice_id + ";";
@@ -66,4 +74,4 @@ class DatabaseManager {
     }
 }
 
-module.exports = new DatabaseManager();
+module.exports = new DatabaseManager(); // singltone object

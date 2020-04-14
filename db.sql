@@ -1,3 +1,5 @@
+-- instruction manual to create sql database --
+
 CREATE DATABASE spice;
 
 CREATE USER 'user'@'localhost' IDENTIFIED BY '12345';
