@@ -1,0 +1,65 @@
+<!--
+    Forms - have 3 version of html for types: add/delete/edit.
+    Just experiment how flexible i can write html.
+-->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel ="stylesheet" type="text/css" href="/style.css">
+    </head>
+<body>
+<div class="menu">
+    <ul>
+        <li><a href="/">К списку специй</a></li>
+        {{if(options.type !== "delete")}}
+            <li><a href="/delete_for_id">Удалить специю</a></li>
+        {{/if}}
+        {{if(options.type !== "add")}}
+            <li><a href="/add_new">Добавить новую специю</a></li>
+        {{/if}}
+        {{if(options.type !== "edit")}}
+            <li><a href="/edit_for_id">Редактировать специю</a></li>
+        {{/if}}
+    </ul>
+</div>
+{{if(options.type === "add")}}
+    <h1>Добавить новую специю</h1>
+    <div class="help">
+        <p>Добавление специй, пока база данных находится в тестовом варианте, добавляется только Название, Количество и Местонахождения</p>
+        <p>Далее добавлю остальные данные и добавлю таблицы справлочники, например, для Местонахождения</p>
+    </div>
+    <form method="post" action="/">
+{{/if}}
+{{if(options.type === "delete")}}
+    <h1>Удаление записи</h1>
+    <div class="help">
+        <p>Для уданения необходимо ввести id записи в последствии этой страницы не будет.</p>
+        <p>В дальнейшем записи будут удалятся при выборе соответствующей кнопки рядом с записью, которую необходимо удалить</p>
+    </div>
+    <form method="post" action="/delete">
+{{/if}}
+{{if(options.type === "edit")}}
+    <h1>Редактирование записи</h1>
+    <div class="help">
+        <p>Подсказки пока что нет :3</p>
+    </div>
+    <form method="post" action="/edit">
+{{/if}}
+    <fieldset>
+        <legend>{{legend}}</legend>  <!-- place to lookups (sqrl) -->
+        {{if(options.type !== "add")}}
+            <br>Identifier: <br><input type="number" name="spice_id" min="0">
+        {{/if}}
+        {{if(options.type !== "delete")}}
+            <br>Title: <br><input type="text" name="title" autofocus required>
+            <br>Count: <br><input type="number" name="sum" max="10000" min="0">
+            <br>Location: <br><input type="text" name="location">
+        {{/if}}
+        <br><br><input type="submit" value="Submit">
+        </fieldset>
+    </form>
+</body>
+</html>

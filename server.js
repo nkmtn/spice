@@ -32,6 +32,16 @@ app.get('/delete_for_id', function (req, res) {
     res.send(myHtml.deleteForId());
 });
 
+// Request to visit the page for edit the record
+app.get('/edit_for_id', function (req, res) {
+    res.send(myHtml.editForId());
+});
+
+// Request for delete the record of database
+app.post('/edit', function(req, res) {
+    /* TODO */
+});
+
 // Request for delete the record of database
 app.post('/delete', function(req, res) {
     var spice_id = req.body.spice_id;
