@@ -39,7 +39,10 @@ app.get('/edit_for_id', function (req, res) {
 
 // Request for delete the record of database
 app.post('/edit', function(req, res) {
-    /* TODO */
+    var spice_id = req.body.spice_id;
+    myDBM.selectForId(spice_id, (result) => {
+        res.send(myHtml.showWithData(result));
+    });
 });
 
 // Request for delete the record of database

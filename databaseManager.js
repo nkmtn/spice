@@ -72,6 +72,18 @@ class DatabaseManager {
             });
         })
     }
+
+    selectForId(spice_id, callback){
+        this.#getConnection().then((conn) => {
+            var sql = "select title, sum, location from spiceinfo where spice_id="+ spice_id +";";
+            conn.query(sql, (err, results, fields) => {
+                if (err) throw err;
+                callback(results);
+                console.log("select: ok");
+                conn.release();
+            });
+        })
+    }
 }
 
 module.exports = new DatabaseManager(); // singltone object

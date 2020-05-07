@@ -20,8 +20,13 @@ function editForId(){
     return Sqrl.renderFile('./views/Forms.html', {legend: 'Write id what you want edit', type: "edit", title: "Edit spice"})
 }
 
+function showWithData(result){
+    return Sqrl.renderFile('./views/Forms.html', {result: result, legend: 'Write id what you want edit', type: "edit", title: "Edit spice", view: "edit"})
+}
+
 // Публичные методы
 module.exports.makeForm = addSpice;
 module.exports.showAllSpice = showAllSpice;
 module.exports.deleteForId = deleteForId;
 module.exports.editForId = editForId;
+module.exports.showWithData = showWithData;
