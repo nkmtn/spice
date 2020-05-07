@@ -1,3 +1,5 @@
+<!--ShowAllSpice - html page for show all records of databases-->
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,6 +12,7 @@
     <ul>
         <li><a href="/add_new">Добавить новую специю</a></li>
         <li><a href="/delete_for_id">Удалить специю</a></li>
+        <li><a href="/edit_for_id">Редактировать специю</a></li>
     </ul>
 </div>
 <h1>Список добавленных специй</h1>
@@ -21,11 +24,12 @@
     <tr>
         <th>Id</th>
         <th>Title</th>
-        <th>Sum</th>
+        <th>Count</th>
         <th>Location</th>
     </tr>
-    {{each(options.result)}}
+    {{each(options.result)}}    <!-- place to lookups (sqrl) data in the loop -->
     <tr>
+        <!-- Data about the record -->
         <td> {{@this.spice_id}} </td>
         <td> {{@this.title}} </td>
         <td> {{@this.sum}} </td>
