@@ -67,13 +67,14 @@
                     }
                 });
 
-            var batchSubmitHandler = $.noop;                
-                
+                var batchSubmitHandler = $.noop;                
+                    
                 $("#spices-grid").jsGrid(spicesConfig)
                 $("#spices-dialog").dialog({
                     autoOpen: false,
                     width: 400,
                     close: function() {
+                        console.log("close");
                         $("#spices-form").validate().resetForm();
                         $("#spices-form").find(".error").removeClass("error");
                     }
@@ -82,22 +83,23 @@
                 $("#spices-form").validate({
                     rules: {
                         spice_title: "required",
-//                         age: { required: true, range: [18, 150] },
-//                         address: { required: true, minlength: 10 },
+    //                         age: { required: true, range: [18, 150] },
+    //                         address: { required: true, minlength: 10 },
                         brand_id: "required"
                     },
                     messages: {
                         spice_title: "Напишите наименование специи",
-//                         age: "Please enter valid age",
-//                         address: "Please enter address (more than 10 chars)",
+    //                         age: "Please enter valid age",
+    //                         address: "Please enter address (more than 10 chars)",
                         brand_id: "Выберите название торговой марки"
                     },
-                    submitHandler: function() {
-                        spiceSubmitHandler();
-                    }
+//                     submitHandler: function() {
+//                         spiceSubmitHandler();
+//                     }
+                    submitHandler: $.noop
                 });
 
-            var spiceSubmitHandler = $.noop;
+                var spiceSubmitHandler = $.noop;
 
 //             spiceSubmitHandler = spiceHandler();
                 
@@ -158,6 +160,10 @@
                             <div id="spices-grid"></div>
                             <div id="spices-dialog" class="ui-widget">
                                 <form id="spices-form">
+                                    <div class="hide">
+                                        <label for="spices-spice-id">Наименование:</label>
+                                        <input id="spices-spice-id" name="spice_id" type="text" />
+                                    </div>
                                     <div class="details-form-field">
                                         <label for="spices-spice-title">Наименование:</label>
                                         <input id="spices-spice-title" name="spice_title" type="text" />

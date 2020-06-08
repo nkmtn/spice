@@ -15,7 +15,8 @@ class DatabaseManager {
             host     : 'localhost',
             user     : 'spice-user',
             password : '12345',
-            database : 'spice'
+            database : 'spice',
+            connectionLimit: 50
         });
     }
 
@@ -92,7 +93,6 @@ class DatabaseManager {
                                 }
                             }
                             callback(data);
-                            console.log("select: ok");
                             conn.release();
                         });
                     });
@@ -114,14 +114,13 @@ class DatabaseManager {
                 var sql = "select tag_id, tag_title from tag;";
             } else {
                 filter = '%' + filter + '%'
-                console.log(filter)
+//                 console.log(filter)
                 var sql = "select tag_id, tag_title from tag where tag_title like '" + filter + "';"
             }
             conn.query(sql, (err, results, fields) => {
                 if (err) throw err;
-                console.log(results)
+//                 console.log(results)
                 callback(results);
-                console.log("select: ok");
                 conn.release();
             });
         })
@@ -144,7 +143,7 @@ class DatabaseManager {
             } else {
                 var sql = "select brand_id, brand_title, brand_description from brand where brand_title like '%"+ title +"%' and brand_description like '%"+ description +"%';";
             }
-            console.log(sql)
+//             console.log(sql)
             conn.query(sql, (err, results, fields) => {
                 if (err) throw err;
                 callback(results);
@@ -204,7 +203,7 @@ class DatabaseManager {
                         brand_title: results[0].brand_title,
                         brand_description: results[0].brand_description
                     }
-                    console.log(data)
+//                     console.log(data)
                     callback(data);
                     conn.release();
                 });
@@ -229,7 +228,7 @@ class DatabaseManager {
             } else {
                 var sql = "select store_id, store_title, store_description from store where store_title like '%"+ title +"%' and store_description like '%"+ description +"%';";
             }
-            console.log(sql)
+//             console.log(sql)
             conn.query(sql, (err, results, fields) => {
                 if (err) throw err;
                 callback(results);
@@ -283,7 +282,7 @@ class DatabaseManager {
         })
     }
     
-    // function to update a store
+    // function to update the store
     editStore(id, title, description, callback){
         this.#getConnection().then((conn) => {
             var sql = "update store set store_title='" + title + "', store_description='" + description + "' where store_id='"+ id +"';";
@@ -308,101 +307,204 @@ class DatabaseManager {
      * SPICE
      */
     
-    // function for select all spice
-    getAllSpices(spice_title, brand_title, tag_ids, callback){
+    // function to add a spice
+    addSpice(title, description, brand_id, tag_ids, callback){
         this.#getConnection().then((conn) => {
-            var data = {
-                spices: []
-            }
-            var sql = '';
-            if (spice_title == '' && brand_title == '' && tag_ids.length == 0) {
-                sql = "select spice.spice_id, spice.spice_title, spice.spice_description, brand.brand_id, brand.brand_title, spice_tag.tag_id, tag.tag_title from spice, spice_tag, tag, brand where spice.spice_id=spice_tag.spice_id and tag.tag_id=spice_tag.tag_id and brand.brand_id=spice.brand_id order by spice_id, tag_id;";
-            }
-            console.log(sql)
-            conn.query(sql, (err, result, fields) => {
+            var sql = "insert into spice (spice_title, spice_description, brand_id, user_id) values(? ,? ,? ,'1') ;"
+            var sql_data = [title, description, brand_id];
+            conn.query(sql, sql_data, (err, results, fields) => {
                 if (err) throw err;
-                var current_spice = {
-                    spice_id: result[0].spice_id,
-                    spice_title: result[0].spice_title,
-                    spice_description: result[0].spice_description,
-                    brand_id: result[0].brand_id,
-                    brand_title: result[0].brand_title,
+                console.log('--- results after inser in spice')
+                console.log(results)
+                if (tag_ids.length > 0) {
+                    sql = "insert into spice_tag (spice_id, tag_id, user_id) values ";
+                    if (tag_ids.length == 1) { 
+                        var spice_id = results.insertId;
+                        sql += "('"+ spice_id + "', '" + tag_ids[0] + "', '1')"
+                    } else {
+                        for (var i = 0; i < tag_ids.length - 1; i++){
+                            sql += "('"+spice_id+"', '"+tag_ids[i]+"', '1'),"
+                        }
+                        sql += "('"+spice_id+"', '"+tag_ids[tag_ids.length - 1]+"', '1')"
+                    }
+                    sql += ";"
+                    conn.query(sql, (err, results, fields) => {
+                        if (err) throw err;
+                        var sql = "select spice.spice_id, spice.spice_title, spice.spice_description, brand.brand_id, " +
+                            "brand.brand_title, spice_tag.tag_id, tag.tag_title from spice, spice_tag, tag, brand " +
+                            "where spice.spice_id=spice_tag.spice_id and tag.tag_id=spice_tag.tag_id and " + 
+                            "brand.brand_id=spice.brand_id and spice.spice_id='" + spice_id+ "';";
+                        conn.query(sql, (err, result, fields) => {
+                            var data = {
+                                spice_id: result[0].spice_id,
+                                spice_title: result[0].spice_title,
+                                spice_description: result[0].spice_description,
+                                brand_id: result[0].brand_id,
+                                brand_title: result[0].brand_title,
+                                
+                            };
+                            callback(data);
+                            conn.release();
+                        });
+                    });
+                } else {
+                    var sql = "select spice.spice_id, spice.spice_title, spice.spice_description, brand.brand_id, " +
+                        "brand.brand_title, spice_tag.tag_id, tag.tag_title from spice, spice_tag, tag, brand " +
+                        "where spice.spice_id=spice_tag.spice_id and tag.tag_id=spice_tag.tag_id and brand.brand_id=spice.brand_id " +
+                        "order by spice_id, tag_id;";
+                    conn.query(sql, (err, result, fields) => {
+                        var data = this.selectAllSpice(result);
+                        callback(data);
+                        conn.release();
+                    });
+                }
+            });
+        })
+    }
+    
+    // function for select all spice without connection releace
+    selectAllSpice(result) {
+        var data = []
+        var current_spice = {
+            spice_id: result[0].spice_id,
+            spice_title: result[0].spice_title,
+            spice_description: result[0].spice_description,
+            brand_id: result[0].brand_id,
+            brand_title: result[0].brand_title,
+            tag_ids: [],
+            tag_titles: []
+        }
+        for (var i = 0; i < result.length; i++){
+            if (current_spice.spice_id === result[i].spice_id){
+                current_spice.tag_ids.push(result[i].tag_id);
+                current_spice.tag_titles.push(result[i].tag_title);
+            } else {
+                current_spice.tag_ids = current_spice.tag_ids.join(',');
+                current_spice.tag_titles = current_spice.tag_titles.join(',');
+                data.push(current_spice)
+                current_spice = {
+                    spice_id: result[i].spice_id,
+                    spice_title: result[i].spice_title,
+                    spice_description: result[i].spice_description,
+                    brand_id: result[i].brand_id,
+                    brand_title: result[i].brand_title,
                     tag_ids: [],
                     tag_titles: []
                 }
-                for (var i = 0; i < result.length; i++){
-                    if (current_spice.spice_id === result[i].spice_id){
-                        current_spice.tag_ids.push(result[i].tag_id);
-                        current_spice.tag_titles.push(result[i].tag_title);
-                        console.log(current_spice.tag_ids, current_spice.spice_id)
-                    } else {
-                        current_spice.tag_ids = current_spice.tag_ids.join();
-                        current_spice.tag_titles = current_spice.tag_titles.join();
-                        data.spices.push(current_spice)
-                        current_spice = {
-                            spice_id: result[i].spice_id,
-                            spice_title: result[i].spice_title,
-                            spice_description: result[i].spice_description,
-                            brand_id: result[i].brand_id,
-                            brand_title: result[i].brand_title,
-                            tag_ids: [],
-                            tag_titles: []
-                        }
-                        i--;
-                    }
-                }
-                console.log(data.spices[1])
-                callback(data.spices);
+                i--;
+            }
+        }
+        current_spice.tag_ids = current_spice.tag_ids.join(',');
+        current_spice.tag_titles = current_spice.tag_titles.join(',');
+        data.push(current_spice)
+        return data;
+    }
+    
+    // function for select all spice
+    getAllSpices(spice_title, brand_title, tag_ids, callback){
+        this.#getConnection().then((conn) => {
+            var sql = '';
+            if (spice_title == '' && brand_title == '' && tag_ids.length == 0) {
+                sql = "select spice.spice_id, spice.spice_title, spice.spice_description, brand.brand_id, " +
+                "brand.brand_title, spice_tag.tag_id, tag.tag_title from spice, spice_tag, tag, brand " +
+                "where spice.spice_id=spice_tag.spice_id and tag.tag_id=spice_tag.tag_id and brand.brand_id=spice.brand_id " +
+                "order by spice_id, tag_id;";
+            }
+            conn.query(sql, (err, result, fields) => {
+                console.log('--- result get all')
+                console.log(result)
+                var data = this.selectAllSpice(result);
+                callback(data);
                 conn.release();
             });
         })
     }
     
-     // function to update a store
+     // function to update the spice
     editSpice(spice_id, spice_title, spice_description, brand_id, tag_ids, callback){
         this.#getConnection().then((conn) => {
-            var data = {}
-            var spice_title = '';
-            var brand_title = '';
-            var tag_ids = [];
-            var sql = "update spice set spice_title='" + spice_title + "', spice_description='" + spice_description + "', brand_id='" + brand_id + "' where spice_id='"+ spice_id +"';";
-            conn.query(sql, (err, results, fields) => {
+            var sql = "update spice set spice_title = ? , spice_description = ? , brand_id = ? where spice_id = ? ;";
+            var sql_data = [spice_title, spice_description, brand_id, spice_id]
+            conn.query(sql, sql_data, (err, results, fields) => {
                 if (err) throw err;
                 sql = "delete from spice_tag where spice_id='" + spice_id +"';";
                 conn.query(sql, (err, results, fields) => {
                     if (err) throw err;
                     if (tag_ids.length > 0) {
-                        sql = "insert into space_tag (space_id, tag_id, user_id) values ";
-                        for (var i = 0; i < tag_ids.length; i++){
-                            sql += "('"+space_id+"', '"+tag_ids[i]+"', '1')"
+                        sql = "insert into spice_tag (spice_id, tag_id, user_id) values ";
+                        if (tag_ids.length == 1) { 
+                            sql += "('"+spice_id+"', '"+tag_ids[0]+"', '1')"
+                        } else {
+                            for (var i = 0; i < tag_ids.length - 1; i++){
+                                sql += "('"+spice_id+"', '"+tag_ids[i]+"', '1'),"
+                            }
+                            sql += "('"+spice_id+"', '"+tag_ids[tag_ids.length - 1]+"', '1')"
                         }
                         sql += ";"
+                        console.log('--- sql update')
+                        console.log(sql)
                         conn.query(sql, (err, results, fields) => {
+                            console.log('---in select')
                             if (err) throw err;
-                            getAllSpices(spice_title, brand_title, tag_ids, (result) => {
+                            console.log('---var sql')
+                            var sql = "select spice.spice_id, spice.spice_title, spice.spice_description, brand.brand_id, " +
+                                "brand.brand_title, spice_tag.tag_id, tag.tag_title from spice, spice_tag, tag, brand " +
+                                "where spice.spice_id=spice_tag.spice_id and tag.tag_id=spice_tag.tag_id and " + 
+                                "brand.brand_id=spice.brand_id and spice.spice_id='" + spice_id + "';";
+                            conn.query(sql, (err, result, fields) => {
+                                console.log(' --- result')
                                 console.log(result)
-                                for(var j = 0; j < result.length; j++){
-                                    data.push(result[j])
+                                var data = {
+                                    spice_id: spice_id,
+                                    spice_title: result[0].spice_title,
+                                    spice_description: result[0].spice_description,
+                                    brand_id: result[0].brand_id,
+                                    brand_title: result[0].brand_title,
+                                    tag_ids: [],
+                                    tag_titles: []
+                                };
+                                for (var i = 0; i < result.length; i++){
+                                    data.tag_ids.push(result[i].tag_id);
+                                    data.tag_titles.push(result[i].tag_title);
                                 }
+                                data.tag_ids = data.tag_ids.join();
+                                data.tag_titles = data.tag_titles.join();
+                                callback(data);
+                                conn.release();
                             });
-                            callback(data);
-                            conn.release();
-                            
                         });
                     } else {
-                        getAllSpices(spice_title, brand_title, tag_ids, (result) => {
-                            console.log(result)
-                            for(var j = 0; j < result.length; j++){
-                                data.push(result[j])
-                            }
+                        this.#getConnection().then((conn) => {
+                            var sql = "select spice.spice_id, spice.spice_title, spice.spice_description, brand.brand_id, " +
+                                    "brand.brand_title, spice_tag.tag_id, tag.tag_title from spice, spice_tag, tag, brand " +
+                                    "where spice.spice_id=spice_tag.spice_id and tag.tag_id=spice_tag.tag_id and " + 
+                                    "brand.brand_id=spice.brand_id and spice.spice_id='" + spice_id + "';";
+                            conn.query(sql, (err, result, fields) => {
+                                var data = {
+                                    spice_id: result[0].spice_id,
+                                    spice_title: result[0].spice_title,
+                                    spice_description: result[0].spice_description,
+                                    brand_id: result[0].brand_id,
+                                    brand_title: result[0].brand_title,
+                                    tag_ids: [],
+                                    tag_titles: []
+                                };
+                                for (var i = 0; i < result.length; i++){
+                                    data.tag_ids.push(result[i].tag_id);
+                                    data.tag_titles.push(result[i].tag_title);
+                                }
+                                data.tag_ids = data.tag_ids.join();
+                                data.tag_titles = data.tag_titles.join();
+                                callback(data);
+                                conn.release();
+                            });
                         });
-                        callback(data);
-                        conn.release();
                     }
                 });
             });
         })
     }
+    
     /*
      * MY SPICE
      */
@@ -410,8 +512,10 @@ class DatabaseManager {
     // function for select all stores
     getAllMySpices(callback){
         this.#getConnection().then((conn) => {
-            var sql = "select spice.spice_id, spice.spice_title, batch.batch_id, store.store_id, store.store_title, batch.batch_number from spice, batch, store where spice.spice_id=batch.spice_id and store.store_id=batch.store_id;";
-            console.log(sql)
+            var sql = "select spice.spice_id, spice.spice_title, batch.batch_id, store.store_id, " +
+            "store.store_title, batch.batch_number from spice, batch, store where " + 
+            "spice.spice_id=batch.spice_id and store.store_id=batch.store_id;";
+//             console.log(sql)
             conn.query(sql, (err, results, fields) => {
                 if (err) throw err;
                 callback(results);
@@ -419,61 +523,6 @@ class DatabaseManager {
             });
         })
     }
-    
-    /*
-    // function for select all the records of databases
-    selectAllSpice(callback){
-        this.#getConnection().then((conn) => {
-            var sql = "select * from spiceinfo;";
-            conn.query(sql, (err, results, fields) => {
-                if (err) throw err;
-                callback(results);
-                console.log("select: ok");
-                conn.release();
-            });
-        })
-    }
-
-    // function for adding a new record in databases
-    addNewSpice(title, count, loc){
-        this.#getConnection().then((conn) => {
-            var sql = "insert into spiceinfo (title, sum, location)" +
-                "values ('" + title + "'," + count + ",'" + loc + "');";
-            conn.query(sql, (err, results, fields) => {
-                if (err) throw err;
-                console.log("insert: ok");
-                conn.release();
-            });
-        })
-    }
-
-    // function for delete the record of databases
-    deleteSpice(spice_id){
-        this.#getConnection().then((conn) => {
-            var sql = "delete from spiceinfo where spice_id=" + spice_id + ";";
-            conn.query(sql, (err, results, fields) => {
-                if (err) throw err;
-                if (results.affectedRows === 0)
-                    console.log("don't deleted!")
-                else
-                    console.log("delete: ok");
-                conn.release();
-            });
-        })
-    }
-
-    selectForId(spice_id, callback){
-        this.#getConnection().then((conn) => {
-            var sql = "select title, sum, location from spiceinfo where spice_id="+ spice_id +";";
-            conn.query(sql, (err, results, fields) => {
-                if (err) throw err;
-                callback(results);
-                console.log("select: ok");
-                conn.release();
-            });
-        })
-    }
-    */
 }
 
 module.exports = new DatabaseManager(); // singltone object
