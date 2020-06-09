@@ -8,6 +8,9 @@ module.exports = (dbm) => {
             description = req.body.spice_description,
             brand_id = req.body.brand_id,
             tag_ids = req.body.tag_ids.split(',');
+            var tag_ids = tag_ids.filter(function(number) {
+                return Number.isInteger(number) && number > 0;
+            });
         dbm.addSpice(title, description, brand_id, tag_ids, (result) => {
             res.json(result);
             res.status(200);
@@ -38,8 +41,6 @@ module.exports = (dbm) => {
             brand_id = req.body.brand_id,
             tag_ids = req.body.tag_ids.split(',');
         dbm.editSpice(spice_id, spice_title, spice_description, brand_id, tag_ids, (result) => {
-            console.log(' --- result update')
-            console.log(result)
             res.json(result)
             res.status(200)
         });

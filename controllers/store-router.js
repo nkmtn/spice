@@ -29,8 +29,8 @@ module.exports = (dbm) => {
     router.post('/', function(req, res) {
         if (req.body.store_title !== undefined){
             var title = req.body.store_title;
-            if (req.body.store_desciption !== undefined)
-                var description = req.body.store_desciption;
+            if (req.body.store_description !== undefined)
+                var description = req.body.store_description;
             else
                 var description = '';
             dbm.addStore(title, description, (result) => {

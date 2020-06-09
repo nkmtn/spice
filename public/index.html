@@ -5,108 +5,60 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <!-- Bootstrap related CSS --> 
+        <!-- Bootstrap CSS --> 
         <link type="text/css" rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">
         
-        <!-- jsGrid related CSS -->  
+        <!-- jsQuery UI CSS --> 
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        
+        <!-- jsGrid CSS -->  
         <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
         <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
-        
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
      
+        <!-- Собственные CSS --> 
         <link rel="stylesheet" href="spices.css">
         
-        <!-- Bootstrap related JS -->  
-        
+        <!-- jsQuery JS -->    
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js" crossorigin="anonymous"></script>
         
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" crossorigin="anonymous"></script>
-
+        <!-- Bootstrap JS --> 
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" crossorigin="anonymous"></script>
+        
+        <!-- jsQuery UI JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
         
         <!-- jsGrid related JS -->  
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
         
+        <!-- Собственные JS -->
         <script src="tags.js"></script>
         <script src="brands.js"></script>
         <script src="stores.js"></script>
         <script src="spices.js"></script>
         <script src="batches.js"></script>
         
-        <script>
+        <script>      
             $(function() {
-                $("#batches-grid").jsGrid(batchesConfig)
-                $("#batches-dialog").dialog({
-                    autoOpen: false,
-                    width: 400,
-                    close: function() {
-                        $("#batches-form").validate().resetForm();
-                        $("#batches-form").find(".error").removeClass("error");
-                    }
-                });
-
-                $("#batches-form").validate({
-                    rules: {
-                        spice_title: "required",
-//                         age: { required: true, range: [18, 150] },
-//                         address: { required: true, minlength: 10 },
-                        store_id: "required"
-                    },
-                    messages: {
-                        spice_title: "Напишите наименование специи",
-//                         age: "Please enter valid age",
-//                         address: "Please enter address (more than 10 chars)",
-                        store_id: "Выберите название хранилища"
-                    },
-                    submitHandler: function() {
-                        batchSubmitHandler();
-                    }
-                });
-
-                var batchSubmitHandler = $.noop;                
-                    
-                $("#spices-grid").jsGrid(spicesConfig)
-                $("#spices-dialog").dialog({
-                    autoOpen: false,
-                    width: 400,
-                    close: function() {
-                        console.log("close");
-                        $("#spices-form").validate().resetForm();
-                        $("#spices-form").find(".error").removeClass("error");
-                    }
-                });
-
-                $("#spices-form").validate({
-                    rules: {
-                        spice_title: "required",
-    //                         age: { required: true, range: [18, 150] },
-    //                         address: { required: true, minlength: 10 },
-                        brand_id: "required"
-                    },
-                    messages: {
-                        spice_title: "Напишите наименование специи",
-    //                         age: "Please enter valid age",
-    //                         address: "Please enter address (more than 10 chars)",
-                        brand_id: "Выберите название торговой марки"
-                    },
-//                     submitHandler: function() {
-//                         spiceSubmitHandler();
-//                     }
-                    submitHandler: $.noop
-                });
-
-                var spiceSubmitHandler = $.noop;
-
-//             spiceSubmitHandler = spiceHandler();
+               
+                createBatchesGrid("#batches-grid", "#batches-dialog", "#batches-form")    
+                createSpicesGrid("#spices-grid", "#spices-dialog", "#spices-form")
+                createStoresGrid("#stores-grid")
+                createBrandsGrid("#brands-grid")
+                createTagsGrid("#tags-grid")
                 
-                $("#stores-grid").jsGrid(storesConfig)     
-                $("#brands-grid").jsGrid(brandsConfig)
-                $("#tags-grid").jsGrid(tagsConfig)
-            });
+                $('[data-toggle="tab"]').on('show.bs.tab', function (e) {  
+                    switch ($(e.target).text()) {
+                        case 'Тэги': reloadTags("#tags-grid")
+                        case 'Бренды': reloadTags("#brands-grid")
+                        case 'Хранилища': reloadTags("#stores-grid")
+                        case 'Специи': reloadTags("#spices-grid")
+                        case 'Мои специи': reloadTags("#batches-grid")
+                    }
+                })
+            })
         </script>
     </head>
     <body>
@@ -137,17 +89,21 @@
                             <div id="batches-grid"></div>
                             <div id="batches-dialog" class="ui-widget">
                                 <form id="batches-form">
+                                    <div class="hide">
+                                        <label for="batches-batch-id">Идентификатор:</label>
+                                        <input id="batches-batch-id" name="batch_id" type="text" />
+                                    </div>
                                     <div class="details-form-field">
                                         <label for="batches-spice-id">Специя:</label>
-                                        <select id="batches-spice-id" name="batches-spice-id"></select>
+                                        <select id="batches-spice-id" name="spice_id"></select>
                                     </div>
                                     <div class="details-form-field">
                                         <label for="batches-store-id">Хранилище:</label>
-                                        <select id="batches-store-id" name="batches-store-id"></select>
+                                        <select id="batches-store-id" name="store_id"></select>
                                     </div>
                                     <div class="details-form-field">
                                         <label for="batches-batch-number">Количество:</label>
-                                        <input id="batches-batch-number" name="batches-batch-number" type="number" />
+                                        <input id="batches-batch-number" name="batch_number" type="number" />
                                     </div>
                                     <div class="details-form-field">
                                         <button type="submit" id="saveBatch">Сохранить</button>
@@ -161,7 +117,7 @@
                             <div id="spices-dialog" class="ui-widget">
                                 <form id="spices-form">
                                     <div class="hide">
-                                        <label for="spices-spice-id">Наименование:</label>
+                                        <label for="spices-spice-id">Идентификатор:</label>
                                         <input id="spices-spice-id" name="spice_id" type="text" />
                                     </div>
                                     <div class="details-form-field">
