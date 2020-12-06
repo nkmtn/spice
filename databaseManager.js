@@ -2,6 +2,7 @@
     databaseManager - module for control databases connection
  */
 
+const path = require('path');
 var mysql = require('mysql');
 
 class DatabaseManager {
@@ -10,12 +11,15 @@ class DatabaseManager {
 
     // Config for databases manage
     constructor() {
-        /*TODO config*/
+        require('dotenv').config({
+            path: path.join(__dirname, '.env.' + process.env.NODE_ENV)
+        });
+
         this.#pool  = mysql.createPool({
-            host     : 'localhost',
-            user     : 'spice-user',
-            password : '12345',
-            database : 'spice',
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database : process.env.DB_NAME,
             connectionLimit: 50
         });
     }

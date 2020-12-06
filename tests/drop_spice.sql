@@ -1,8 +1,8 @@
 USE spice_test;
-DROP TABLE `spice_tag`;
-DROP TABLE `tag`;
-DROP TABLE `batch`;
-DROP TABLE `store`;
-DROP TABLE `spice`;
-DROP TABLE `brand`;
-DROP TABLE `user`;
+DROP TABLE IF EXISTS `spice_tag`;
+DROP TABLE IF EXISTS `tag`;
+DROP TABLE IF EXISTS `batch`;
+DROP TABLE IF EXISTS `store`;
+DROP TABLE IF EXISTS `spice`;
+DROP TABLE IF EXISTS `brand`;
+DROP TABLE IF EXISTS `user`;

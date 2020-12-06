@@ -2,6 +2,10 @@
     server.js - main file. Server part and router here for now.
     Used node.js with express.
 */
+const path = require('path');
+require('dotenv').config({
+    path: path.join(__dirname, '.env.' + process.env.NODE_ENV)
+});
 
 var express = require('express');
 var app = express();

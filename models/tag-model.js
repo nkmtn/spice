@@ -50,10 +50,10 @@ class TagModel {
         this.getConnection().then((conn) => {
             var sql = "select tag_title from tag where tag_title='"+ title +"' ;"
             conn.query(sql, (err, results, fields) => {
-                console.log('dont exist');
+                // console.log('dont exist');
                 if (err) throw err;
                 if (results < 1) {
-                    console.log('try insert')
+                    // console.log('try insert')
                     var sql = "insert into tag (tag_title, user_id) values('"+ title +"' , '1') ;"
                     conn.query(sql, (err, results, fields) => {
                         if (err) throw err;
@@ -72,7 +72,7 @@ class TagModel {
                         });
                     });
                 } else {
-                    console.log('err')
+                    // console.log('err')
                     var data = {
                         status: 400,
                         res: 1

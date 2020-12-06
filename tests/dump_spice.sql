@@ -15,37 +15,45 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `batch`
---
+USE spice_test;
 
+DROP TABLE IF EXISTS `spice_tag`;
+DROP TABLE IF EXISTS `tag`;
 DROP TABLE IF EXISTS `batch`;
+DROP TABLE IF EXISTS `store`;
+DROP TABLE IF EXISTS `spice`;
+DROP TABLE IF EXISTS `brand`;
+DROP TABLE IF EXISTS `user`;
+
+--
+-- Table structure for table `user`
+--
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `batch` (
-  `batch_id` int(11) NOT NULL AUTO_INCREMENT,
-  `batch_number` varchar(45) DEFAULT NULL,
-  `spice_id` int(11) NOT NULL,
-  `store_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`batch_id`),
-  KEY `fk_batch_spice1_idx` (`spice_id`),
-  KEY `fk_batch_store1_idx` (`store_id`),
-  KEY `fk_batch_user1_idx` (`user_id`),
-  CONSTRAINT `fk_batch_spice1` FOREIGN KEY (`spice_id`) REFERENCES `spice` (`spice_id`),
-  CONSTRAINT `fk_batch_store1` FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
-  CONSTRAINT `fk_batch_user1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+CREATE TABLE `user` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_email` varchar(255) NOT NULL,
+  `user_pass` char(32) NOT NULL,
+  `user_salt` char(32) NOT NULL,
+  `user_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_status` int(11) NOT NULL DEFAULT '0',
+  `user_activation_hash` char(32) NOT NULL,
+  `user_activation_sent` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_passforgot_hash` char(32) DEFAULT NULL,
+  `user_passforgot_requested` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `batch`
+-- Dumping data for table `user`
 --
 
-LOCK TABLES `batch` WRITE;
-/*!40000 ALTER TABLE `batch` DISABLE KEYS */;
-INSERT INTO `batch` VALUES (1,'2',1,1,1),(2,'4',2,4,1),(3,'1',2,3,1),(4,'1',3,2,1),(5,'2',4,3,1),(6,'3',5,3,1);
-/*!40000 ALTER TABLE `batch` ENABLE KEYS */;
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'example@email.ru','12345','67','2020-06-03 20:05:23','2020-06-03 20:05:23',0,'54321','2020-06-03 20:05:23',NULL,NULL);
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -108,38 +116,6 @@ INSERT INTO `spice` VALUES (1,'tmin','ggg',2,1),(2,'rozmarine','ohoho',5,1),(3,'
 UNLOCK TABLES;
 
 --
--- Table structure for table `spice_tag`
---
-
-DROP TABLE IF EXISTS `spice_tag`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `spice_tag` (
-  `spice_tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `spice_id` int(11) NOT NULL,
-  `tag_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`spice_tag_id`),
-  KEY `fk_spice_tag_spice1_idx` (`spice_id`),
-  KEY `fk_spice_tag_tag1_idx` (`tag_id`),
-  KEY `fk_spice_tag_user1_idx` (`user_id`),
-  CONSTRAINT `fk_spice_tag_spice1` FOREIGN KEY (`spice_id`) REFERENCES `spice` (`spice_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_spice_tag_tag1` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_spice_tag_user1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `spice_tag`
---
-
-LOCK TABLES `spice_tag` WRITE;
-/*!40000 ALTER TABLE `spice_tag` DISABLE KEYS */;
-INSERT INTO `spice_tag` VALUES (202,1,1,1),(203,1,2,1),(204,2,2,1),(205,2,3,1),(206,3,2,1),(207,3,1,1),(208,7,1,1),(209,6,1,1),(210,6,2,1),(211,6,3,1),(212,5,2,1),(213,5,1,1);
-/*!40000 ALTER TABLE `spice_tag` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `store`
 --
 
@@ -165,6 +141,39 @@ LOCK TABLES `store` WRITE;
 /*!40000 ALTER TABLE `store` DISABLE KEYS */;
 INSERT INTO `store` VALUES (1,'konteiner 1','1 polka',1),(2,'konteiner 2','1 polka',1),(3,'konteiner 3','1 polka',1),(4,'konteiner 4','2 polka',1);
 /*!40000 ALTER TABLE `store` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `batch`
+--
+
+DROP TABLE IF EXISTS `batch`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `batch` (
+  `batch_id` int(11) NOT NULL AUTO_INCREMENT,
+  `batch_number` varchar(45) DEFAULT NULL,
+  `spice_id` int(11) NOT NULL,
+  `store_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`batch_id`),
+  KEY `fk_batch_spice1_idx` (`spice_id`),
+  KEY `fk_batch_store1_idx` (`store_id`),
+  KEY `fk_batch_user1_idx` (`user_id`),
+  CONSTRAINT `fk_batch_spice1` FOREIGN KEY (`spice_id`) REFERENCES `spice` (`spice_id`),
+  CONSTRAINT `fk_batch_store1` FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
+  CONSTRAINT `fk_batch_user1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `batch`
+--
+
+LOCK TABLES `batch` WRITE;
+/*!40000 ALTER TABLE `batch` DISABLE KEYS */;
+INSERT INTO `batch` VALUES (1,'2',1,1,1),(2,'4',2,4,1),(3,'1',2,3,1),(4,'1',3,2,1),(5,'2',4,3,1),(6,'3',5,3,1);
+/*!40000 ALTER TABLE `batch` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -195,37 +204,36 @@ INSERT INTO `tag` VALUES (1,'miaso',1),(2,'chicken',1),(3,'fish',1),(5,'fffnc',1
 UNLOCK TABLES;
 
 --
--- Table structure for table `user`
+-- Table structure for table `spice_tag`
 --
 
-DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user` (
-  `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_email` varchar(255) NOT NULL,
-  `user_pass` char(32) NOT NULL,
-  `user_salt` char(32) NOT NULL,
-  `user_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `user_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `user_status` int(11) NOT NULL DEFAULT '0',
-  `user_activation_hash` char(32) NOT NULL,
-  `user_activation_sent` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `user_passforgot_hash` char(32) DEFAULT NULL,
-  `user_passforgot_requested` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+CREATE TABLE `spice_tag` (
+  `spice_tag_id` int(11) NOT NULL AUTO_INCREMENT,
+  `spice_id` int(11) NOT NULL,
+  `tag_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`spice_tag_id`),
+  KEY `fk_spice_tag_spice1_idx` (`spice_id`),
+  KEY `fk_spice_tag_tag1_idx` (`tag_id`),
+  KEY `fk_spice_tag_user1_idx` (`user_id`),
+  CONSTRAINT `fk_spice_tag_spice1` FOREIGN KEY (`spice_id`) REFERENCES `spice` (`spice_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_spice_tag_tag1` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_spice_tag_user1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user`
+-- Dumping data for table `spice_tag`
 --
 
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'example@email.ru','12345','67','2020-06-03 20:05:23','2020-06-03 20:05:23',0,'54321','2020-06-03 20:05:23',NULL,NULL);
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+LOCK TABLES `spice_tag` WRITE;
+/*!40000 ALTER TABLE `spice_tag` DISABLE KEYS */;
+INSERT INTO `spice_tag` VALUES (202,1,1,1),(203,1,2,1),(204,2,2,1),(205,2,3,1),(206,3,2,1),(207,3,1,1),(208,7,1,1),(209,6,1,1),(210,6,2,1),(211,6,3,1),(212,5,2,1),(213,5,1,1);
+/*!40000 ALTER TABLE `spice_tag` ENABLE KEYS */;
 UNLOCK TABLES;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
